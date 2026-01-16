@@ -1,0 +1,10 @@
+- hosts: k8s
+  tasks:
+    - name: Deploy stable app
+      shell: kubectl apply -f kubernetes/stable-deployment.yaml
+
+    - name: Deploy canary app
+      shell: kubectl apply -f kubernetes/canary-deployment.yaml
+
+    - name: Apply service
+      shell: kubectl apply -f kubernetes/service.yaml

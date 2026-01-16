@@ -1,0 +1,52 @@
+pipeline {
+    agent any
+
+    environment {
+        IMAGE_V2 = "webapp-devops:v2"
+    }
+
+    stages {
+
+        stage('Checkout Code') {
+            steps {
+                git url: 'https://github.com/your-team/enterprise-devops-platform.git'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh '''
+                eval $(minikube docker-env)
+                docker build -t $IMAGE_V2 app/
+                '''
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                sh 'security/trivy-scan.sh'
+            }
+        }
+
+        stage('Deploy Canary') {
+            steps {
+                sh 'ansible-playbook ansible/deploy.yml'
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                sh '''
+                sleep 20
+                curl http://$(minikube ip):30007/health || exit 1
+                '''
+            }
+        }
+    }
+
+    post {
+        failure {
+            sh 'ansible-playbook ansible/rollback.yml'
+        }
+    }
+}

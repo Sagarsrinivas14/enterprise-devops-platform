@@ -7,12 +7,6 @@ pipeline {
 
     stages {
 
-        stage('Checkout Code') {
-            steps {
-                git url: 'https://github.com/your-team/enterprise-devops-platform.git'
-            }
-        }
-
         stage('Build Docker Image') {
             steps {
                 sh '''
@@ -30,7 +24,7 @@ pipeline {
 
         stage('Deploy Canary') {
             steps {
-                sh 'ansible-playbook ansible/deploy.yml'
+                sh 'ansible-playbook -i ansible/inventory.ini ansible/deploy.yml'
             }
         }
 
@@ -38,7 +32,7 @@ pipeline {
             steps {
                 sh '''
                 sleep 20
-                curl http://$(minikube ip):30007/health || exit 1
+                curl http://$(minikube ip):30007/health
                 '''
             }
         }
@@ -46,7 +40,7 @@ pipeline {
 
     post {
         failure {
-            sh 'ansible-playbook ansible/rollback.yml'
+            sh 'ansible-playbook -i ansible/inventory.ini ansible/rollback.yml'
         }
     }
 }

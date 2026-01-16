@@ -7,18 +7,15 @@ spec:
   selector:
     matchLabels:
       app: webapp
-      track: canary
+      version: canary
   template:
     metadata:
       labels:
         app: webapp
-        track: canary
+        version: canary
     spec:
       containers:
       - name: webapp
         image: webapp-devops:v2
-        env:
-        - name: APP_VERSION
-          value: "v2"
         ports:
         - containerPort: 5000

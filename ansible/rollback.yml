@@ -1,5 +1,10 @@
 - hosts: k8s
-  become: false
+  connection: local
   tasks:
     - name: Rollback canary deployment safely
-      shell: kubectl delete -f kubernetes/canary-deployment.yaml --ignore-not-found
+      shell: |
+        if [ -f kubernetes/canary-deployment.yaml ]; then
+          kubectl delete -f kubernetes/canary-deployment.yaml --ignore-not-found
+        else
+          echo "Canary deployment file not found, skipping rollback"
+        fi

@@ -1,6 +1,5 @@
 - hosts: k8s
+  become: false
   tasks:
-    - name: Rollback canary (safe)
-  shell: |
-    kubectl delete -f kubernetes/canary-deployment.yaml --ignore-not-found
-
+    - name: Rollback canary deployment safely
+      shell: kubectl delete -f kubernetes/canary-deployment.yaml --ignore-not-found
